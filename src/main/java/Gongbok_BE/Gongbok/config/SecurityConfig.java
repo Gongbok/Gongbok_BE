@@ -60,7 +60,7 @@ public class SecurityConfig {
                 // 아이콘, css, js 관련
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console, 로그아웃에 인증없이 접근 가능
                 .antMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
-                .antMatchers(/*"**"*/ "/sign-up").permitAll() // 회원가입 접근 가능
+                .antMatchers("**").permitAll() // TODO: 나중에 Token 있는 회원만 접근할 수 있도록 해당 줄을 삭제
                 .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
                 .and()
                 //== 소셜 로그인 설정 ==//
