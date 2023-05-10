@@ -3,10 +3,12 @@ package Gongbok_BE.Gongbok.auth.jwt.service;
 import Gongbok_BE.Gongbok.config.HttpUtil;
 import Gongbok_BE.Gongbok.exception.AllGongbokException;
 import Gongbok_BE.Gongbok.exception.ErrorCode;
+import Gongbok_BE.Gongbok.member.domain.Role;
 import Gongbok_BE.Gongbok.member.dto.MemberResponseDto;
 import Gongbok_BE.Gongbok.member.repository.MemberRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -82,25 +88,23 @@ public class JwtService {
                 .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
     }
+    
+    // AccessToken + RefreshToken + Role(Guest) 실어서 보내기
+    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        Map<String, Object> data = new HashMap<>();
+        data.put("accessToken", accessToken);
+        data.put("refreshToken", refreshToken);
+        data.put("role", Role.GUEST);
 
-    /**
-     * AccessToken 헤더에 실어서 보내기
-     */
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(data);
+
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
 
-        response.setHeader(accessHeader, accessToken);
-        log.info("재발급된 Access Token : {}", accessToken);
-    }
-
-    /**
-     * AccessToken + RefreshToken 헤더에 실어서 보내기
-     */
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        setAccessTokenHeader(response, accessToken);
-        setRefreshTokenHeader(response, refreshToken);
+        PrintWriter writer = response.getWriter();
+        writer.print(json);
+        writer.flush();
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 

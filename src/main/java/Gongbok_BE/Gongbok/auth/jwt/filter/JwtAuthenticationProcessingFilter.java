@@ -96,8 +96,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                     if(redisTemplate.opsForValue().get(user.getEmail()) == null) // 로그아웃한 회원이라면
                         throw new AllGongbokException(ErrorCode.INVALID_TOKEN_LOGOUT, ErrorCode.INVALID_TOKEN_LOGOUT.getMessage());
                     String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
-                            reIssuedRefreshToken);
+                    try {
+                        jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
+                                reIssuedRefreshToken);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
     }
 
