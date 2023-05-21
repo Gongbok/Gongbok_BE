@@ -3,11 +3,13 @@ package Gongbok_BE.Gongbok.member.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
-@NoArgsConstructor
 @Entity
 @Builder
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class Member {
 
@@ -15,6 +17,9 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "memberId")
     private Long id;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    List<StarHistory> starHistories = new ArrayList<>();
 
     private String email;
     private String password;

@@ -24,4 +24,25 @@ public class MemberResponseDto {
         private String nickname;
         private int birthYear;
     }
+
+    @Data
+    @Builder
+    public static class star {
+        private int starNum;
+    }
+
+    @Data
+    @Builder
+    public static class starHistory {
+        private String reason;
+        private int starNum;
+    }
+
+//    @Data
+//    @Builder
+//    public static class starRank {
+//        private String nickname;
+//        private int starNum;
+//    }
+
 }

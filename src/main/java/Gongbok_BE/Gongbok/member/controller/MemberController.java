@@ -8,6 +8,8 @@ import Gongbok_BE.Gongbok.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/member")
@@ -39,6 +41,23 @@ public class MemberController {
                 memberService.updateProfile(requestDto);
         return Response.success(updateProfileResponse);
     }
+
+    @GetMapping("/star")
+    public Response<MemberResponseDto.star> getStarNum(){
+        MemberResponseDto.star starResponse = memberService.getStarNum();
+        return Response.success(starResponse);
+    }
+
+    @GetMapping("/history")
+    public Response<List<MemberResponseDto.starHistory>> getStarHistory(){
+        List<MemberResponseDto.starHistory> historyResponse = memberService.getStarHistory();
+        return Response.success(historyResponse);
+    }
+
+//    @GetMapping("")
+//    public Response<List<MemberResponseDto.starRank>> getAllRank(){
+//        List<MemberResponseDto.starRank> starRankList = memberService.getAllRank();
+//    }
 
     @GetMapping("/jwt-test")
     public String jwtTest() {
