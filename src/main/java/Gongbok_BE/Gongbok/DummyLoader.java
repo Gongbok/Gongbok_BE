@@ -24,5 +24,8 @@ public class DummyLoader {
         Member member2 = new Member(2L, new ArrayList<>(), "skjn@test.com", "", "대학수업",
                 2001, "", 50, Role.USER, SocialType.KAKAO, "", "");
         memberRepository.save(member2);
+        Member member3 = new Member(3L, new ArrayList<>(), "333@test.com", "", "뚜벅이밴",
+                1999, "", 250, Role.USER, SocialType.KAKAO, "", "");
+        memberRepository.save(member3);
     }
 }

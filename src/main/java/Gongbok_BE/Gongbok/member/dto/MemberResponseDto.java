@@ -38,6 +38,15 @@ public class MemberResponseDto {
         private int starNum;
     }
 
+    @Data
+    @Builder
+    public static class starRank {
+        private Long memberId;
+        private String nickname;
+        private int birthYear;
+        private int starNum;
+    }
+
 //    @Data
 //    @Builder
 //    public static class starRank {
