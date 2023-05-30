@@ -15,4 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findBySocialTypeAndSocialId(SocialType socialType, String id);
 
     Slice<Member> findByBirthYearOrderByStarNumDesc(int birthYear, Pageable pageable);
+
+    boolean existsByEmail(String email);
 }
