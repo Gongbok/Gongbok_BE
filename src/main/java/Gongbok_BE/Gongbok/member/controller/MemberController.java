@@ -59,6 +59,11 @@ public class MemberController {
         return Response.success(memberService.getSameAgeRank(pageable));
     }
 
+    @GetMapping("/ranking/friend")
+    public Response<Slice<MemberResponseDto.starRank>> getFriendRank(Pageable pageable){
+        return Response.success(memberService.getFriendRank(pageable));
+    }
+
     @GetMapping("/jwt-test")
     public String jwtTest() {
         return "jwtTest 요청 성공";

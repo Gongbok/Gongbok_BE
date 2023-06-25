@@ -16,5 +16,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Slice<Member> findByBirthYearOrderByStarNumDesc(int birthYear, Pageable pageable);
 
-    boolean existsByEmail(String email);
+    Optional<Member> findByNickname(String nickname);
 }

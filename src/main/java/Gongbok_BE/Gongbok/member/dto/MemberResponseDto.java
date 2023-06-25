@@ -46,12 +46,4 @@ public class MemberResponseDto {
         private int birthYear;
         private int starNum;
     }
-
-//    @Data
-//    @Builder
-//    public static class starRank {
-//        private String nickname;
-//        private int starNum;
-//    }
-
 }
