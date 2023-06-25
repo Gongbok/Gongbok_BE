@@ -1,6 +1,8 @@
 package Gongbok_BE.Gongbok.member.service;
 
 import Gongbok_BE.Gongbok.ValidateService;
+import Gongbok_BE.Gongbok.friendship.dto.FriendshipResponseDto;
+import Gongbok_BE.Gongbok.friendship.service.FriendshipService;
 import Gongbok_BE.Gongbok.member.domain.Role;
 import Gongbok_BE.Gongbok.member.domain.Member;
 import Gongbok_BE.Gongbok.member.dto.MemberRequestDto;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final ValidateService validateService;
+    private final FriendshipService friendshipService;
     private final MemberRepository memberRepository;
     private final StarHistoryRepository starHistoryRepository;
 
@@ -82,6 +87,31 @@ public class MemberService {
         return getStarRanks(pageable, memberSlice);
     }
 
+    public Slice<MemberResponseDto.starRank> getFriendRank(Pageable pageable) {
+        List<FriendshipResponseDto.friend> allFriends = friendshipService.findAllFriends();
+        List<MemberResponseDto.starRank> sortedFriendList = allFriends.stream()
+                .sorted(Comparator.comparingInt(FriendshipResponseDto.friend::getStarNum).reversed())
+                .map(friend -> MemberResponseDto.starRank.builder()
+                        .memberId(friend.getId())
+                        .nickname(friend.getNickname())
+                        .starNum(friend.getStarNum())
+                        .build())
+                .collect(Collectors.toList());
+
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<MemberResponseDto.starRank> pagedFriendList;
+
+        if (sortedFriendList.size() < startItem) {
+            pagedFriendList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, sortedFriendList.size());
+            pagedFriendList = sortedFriendList.subList(startItem, toIndex);
+        }
+        return new SliceImpl<>(pagedFriendList, pageable, sortedFriendList.size() > (startItem + pageSize));
+    }
+
     private Slice<MemberResponseDto.starRank> getStarRanks(Pageable pageable, Slice<Member> memberSlice) {
         List<MemberResponseDto.starRank> starRankList = memberSlice.getContent().stream()
                 .map(m -> MemberResponseDto.starRank.builder()
@@ -93,8 +123,4 @@ public class MemberService {
                 .collect(Collectors.toList());
         return new SliceImpl<>(starRankList, pageable, memberSlice.hasNext());
     }
-
-//    public List<MemberResponseDto.starRank> getAllRank() {
-//        return null;
-//    }
 }
