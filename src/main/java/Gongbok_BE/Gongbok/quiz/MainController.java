@@ -1,5 +1,6 @@
 package Gongbok_BE.Gongbok.quiz;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,11 +14,11 @@ import java.net.URL;
 @RestController
 public class MainController {
 
+    @Value("${openai.api.key}")
+    private String apiKey;
+
     @PostMapping("/extract-topic")
     public String extractMainTopic(@RequestBody String input) {
-
-        String apiKey = System.getenv("OPENAI_API_KEY");
-
         try {
             String mainTopic = extractMainTopicFromInput(input, apiKey);
             String question = generateQuestion(mainTopic, apiKey);
