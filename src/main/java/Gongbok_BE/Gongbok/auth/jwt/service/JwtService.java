@@ -89,23 +89,25 @@ public class JwtService {
                 .sign(Algorithm.HMAC512(secretKey));
     }
     
-    // AccessToken + RefreshToken + Role(Guest) 실어서 보내기
+    // AccessToken + RefreshToken 실어서 보내기
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        Map<String, Object> data = new HashMap<>();
+        data.put("accessToken", accessToken);
+        data.put("refreshToken", refreshToken);
+
+        makeJsonResponse(response, data);
+        log.info("Access Token, Refresh Token 헤더 설정 완료");
+    }
+
+    // 회원가입 전이라는 것을 프론트에게 알려주기 위해 Role이 Guest임을 넘겨줌
+    public void sendAccessAndRefreshTokenBeforeSignup(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
         Map<String, Object> data = new HashMap<>();
         data.put("accessToken", accessToken);
         data.put("refreshToken", refreshToken);
         data.put("role", Role.GUEST);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(data);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-
-        PrintWriter writer = response.getWriter();
-        writer.print(json);
-        writer.flush();
-        log.info("Access Token, Refresh Token 헤더 설정 완료");
+        makeJsonResponse(response, data);
+        log.info("신규 회원을 위한 Access Token, Refresh Token 헤더 설정 완료");
     }
 
     /**
@@ -237,5 +239,17 @@ public class JwtService {
         return MemberResponseDto.logout.builder()
                 .message("로그아웃 성공")
                 .build();
+    }
+
+    private void makeJsonResponse(HttpServletResponse response, Map<String, Object> data) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(data);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+
+        PrintWriter writer = response.getWriter();
+        writer.print(json);
+        writer.flush();
     }
 }

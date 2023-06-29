@@ -6,6 +6,8 @@ import Gongbok_BE.Gongbok.member.dto.MemberRequestDto;
 import Gongbok_BE.Gongbok.member.dto.MemberResponseDto;
 import Gongbok_BE.Gongbok.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,45 +21,48 @@ public class MemberController {
 
     @GetMapping("/logout")
     public Response<MemberResponseDto.logout> logout() {
-        MemberResponseDto.logout logoutResponse = jwtService.logout();
-        return Response.success(logoutResponse);
+        return Response.success(jwtService.logout());
     }
 
     @GetMapping
     public Response<MemberResponseDto.profile> getInfo() {
-        MemberResponseDto.profile profileResponse = memberService.getInfo();
-        return Response.success(profileResponse);
+        return Response.success(memberService.getInfo());
     }
 
     @DeleteMapping
     public Response<MemberResponseDto.withdraw> withdraw(){
-        MemberResponseDto.withdraw withdrawResponse = memberService.withdraw();
-        return Response.success(withdrawResponse);
+        return Response.success(memberService.withdraw());
     }
 
     @PatchMapping
     public Response<MemberResponseDto.profile> updateProfile(@RequestBody MemberRequestDto requestDto){
-        MemberResponseDto.profile updateProfileResponse =
-                memberService.updateProfile(requestDto);
-        return Response.success(updateProfileResponse);
+        return Response.success(memberService.updateProfile(requestDto));
     }
 
     @GetMapping("/star")
     public Response<MemberResponseDto.star> getStarNum(){
-        MemberResponseDto.star starResponse = memberService.getStarNum();
-        return Response.success(starResponse);
+        return Response.success(memberService.getStarNum());
     }
 
     @GetMapping("/history")
     public Response<List<MemberResponseDto.starHistory>> getStarHistory(){
-        List<MemberResponseDto.starHistory> historyResponse = memberService.getStarHistory();
-        return Response.success(historyResponse);
+        return Response.success(memberService.getStarHistory());
     }
 
-//    @GetMapping("")
-//    public Response<List<MemberResponseDto.starRank>> getAllRank(){
-//        List<MemberResponseDto.starRank> starRankList = memberService.getAllRank();
-//    }
+    @GetMapping("/ranking")
+    public Response<Slice<MemberResponseDto.starRank>> getAllRank(Pageable pageable){
+        return Response.success(memberService.getAllRank(pageable));
+    }
+
+    @GetMapping("/ranking/same_age")
+    public Response<Slice<MemberResponseDto.starRank>> getSameAgeRank(Pageable pageable){
+        return Response.success(memberService.getSameAgeRank(pageable));
+    }
+
+    @GetMapping("/ranking/friend")
+    public Response<Slice<MemberResponseDto.starRank>> getFriendRank(Pageable pageable){
+        return Response.success(memberService.getFriendRank(pageable));
+    }
 
     @GetMapping("/jwt-test")
     public String jwtTest() {
