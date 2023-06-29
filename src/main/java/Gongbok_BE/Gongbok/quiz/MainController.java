@@ -1,50 +1,36 @@
 package Gongbok_BE.Gongbok.quiz;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+@RestController
+public class MainController {
 
+    @PostMapping("/extract-topic")
+    public String extractMainTopic(@RequestBody String input) {
 
-public class quiz {
+        String apiKey = System.getenv("OPENAI_API_KEY");
 
-    public static void main(String[] args) {
-        // Set up your OpenAI API credentials
-        String apiKey = "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";
-
-        // Prompt the user for input
-        System.out.println("Enter the input paragraph:");
-        String userInput = getUserInput();
-
-        // Extract the main topic word
         try {
-            String mainTopic = extractMainTopic(userInput, apiKey);
-            System.out.println("Main topic: " + mainTopic);
-
-            // Generate a question with the main topic as the answer
+            String mainTopic = extractMainTopicFromInput(input, apiKey);
             String question = generateQuestion(mainTopic, apiKey);
-            System.out.println("Generated question: " + question);
+
+            return "Main topic: " + mainTopic + "\nGenerated question: " + question;
         } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage());
+            return "Error: " + e.getMessage();
         }
     }
 
-    private static String getUserInput() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            return reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    private static String extractMainTopic(String input, String apiKey) throws IOException {
+    private String extractMainTopicFromInput(String input, String apiKey) throws IOException {
         String apiUrl = "https://api.openai.com/v1/completions";
 
-        // Compose the data for the API request
         String requestData = "{\n" +
                 "  \"prompt\": \"Extract the main topic word from the following input:\\n\\n" + input + "\\n\\nMain topic word:\",\n" +
                 "  \"max_tokens\": 7,\n" +
@@ -53,7 +39,7 @@ public class quiz {
                 "  \"model\": \"text-davinci-003\"\n" +
                 "}";
 
-        // Make the API request
+
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -79,8 +65,8 @@ public class quiz {
         }
     }
 
-    private static String generateQuestion(String answer, String apiKey) throws IOException {
-        String apiUrl = "https://api.openai.com/v1/engines/davinci/completions";
+    private String generateQuestion(String answer, String apiKey) throws IOException {
+            String apiUrl = "https://api.openai.com/v1/completions";
 
         // Compose the data for the API request
         String requestData = "{\n" +
