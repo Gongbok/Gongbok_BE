@@ -67,8 +67,20 @@ public class ReviewController {
 
     }
 
+    @DeleteMapping("/subject/{subjectId}")
+    public ResponseEntity<String> deleteSubject(@PathVariable long subjectId) {
+        Subject subject = subjectService.getSubjectById(subjectId);
+        if (subject == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        subjectService.deleteSubject(subject);
+
+        return ResponseEntity.ok("Subject deleted");
+    }
+
     @PostMapping("subject/{subjectId}/week")
-    public ResponseEntity<String> createNextWeek(@PathVariable long subjectId){ //SubjectRequest subjectRequest) {
+    public ResponseEntity<String> createNextWeek(@PathVariable long subjectId){
         // SubjectRequest로부터 subjectId를 추출하여 Subject 객체를 가져옴
         //long subjectId = subjectRequest.getSubjectId();
         //weekRequest.setWeekId(subjectId);
@@ -84,17 +96,6 @@ public class ReviewController {
         return ResponseEntity.ok("weekNum saved: " + week.getWeekNum());
     }
 
-    /*@GetMapping("/week/dummy")
-    public ResponseEntity<WeekResponse> getWeekNum(@PathVariable int num) {
-        Week week = weekService.getWeekByNum(num);
-        if (week == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        WeekResponse response = new WeekResponse(week.getWeekNum());
-        return ResponseEntity.ok(response);
-    }*/
-
     @GetMapping("subject/{subjectId}/week")
     public ResponseEntity<List<Integer>> getWeekNum(@PathVariable Long subjectId) {
         Subject subject = subjectService.getSubjectById(subjectId);
@@ -107,19 +108,37 @@ public class ReviewController {
         return ResponseEntity.ok(weekNums);
     }
 
-    /*@PatchMapping("/content/{id}")
-    public ResponseEntity<String> updateContent(@PathVariable Long id, @RequestBody String content) {
-        Week week = weekService.getWeekById(id);
-        Content existingContent = contentService.getContentById(id);
-        if (existingContent == null) {
+    @GetMapping("subject/{subjectId}/week/{weekNum}")
+    public ResponseEntity<Integer> getWeekNum(@PathVariable long subjectId, @PathVariable int weekNum) {
+        Subject subject = subjectService.getSubjectById(subjectId);
+        if (subject == null) {
             return ResponseEntity.notFound().build();
         }
 
-        existingContent.setContent(content);
-        contentService.saveContent(existingContent);
+        List<Integer> weekNums = weekRepository.findAllWeekNumbersBySubject(subject);
+        if (!weekNums.contains(weekNum)) {
+            return ResponseEntity.notFound().build();
+        }
 
-        return ResponseEntity.ok("Content updated");
-    }*/
+        return ResponseEntity.ok(weekNum);
+    }
+
+    @DeleteMapping("subject/{subjectId}/week/{weekNum}")
+    public ResponseEntity<String> deleteWeek(@PathVariable long subjectId, @PathVariable int weekNum) {
+        Subject subject = subjectService.getSubjectById(subjectId);
+        if (subject == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Week week = weekRepository.findBySubjectAndWeekNum(subject, weekNum);
+        if (week == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        weekRepository.delete(week);
+
+        return ResponseEntity.ok("Week " + weekNum + " deleted");
+    }
 
     @PatchMapping("subject/{subjectId}/week/{weekNum}/content")
     public ResponseEntity<String> addContentToWeek(@PathVariable long subjectId, @PathVariable int weekNum, @RequestBody String contentText) {
