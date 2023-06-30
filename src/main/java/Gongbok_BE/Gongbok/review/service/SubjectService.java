@@ -28,6 +28,10 @@ public class SubjectService {
         return subjectRepository.save(subject);
     }
 
+    public void deleteSubject(Subject subject) {
+        subjectRepository.delete(subject);
+    }
+
     public List<Subject> getAllSubjects() {
         return subjectRepository.findAll();
     }
